@@ -1,4 +1,4 @@
-;;; company-quickhelp --- Popup documentation for completion candidates
+;;; company-quickhelp.el --- Popup documentation for completion candidates
 
 ;; Copyright (C) 2015, Lars Andersen
 
