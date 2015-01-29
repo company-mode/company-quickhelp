@@ -6,7 +6,7 @@
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
 ;; Version: 0.1
-;; Package-Requires: ((company "0.8.9") (pos-tip "0.4.6"))
+;; Package-Requires: ((emacs "24") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -96,8 +96,6 @@
     (setq company-frontends
           (delq 'company-quickhelp-frontend company-frontends))
     (company-quickhelp--cancel-timer)))
-
-(provide 'company-quickhelp)
 
 (provide 'company-quickhelp)
 
