@@ -96,7 +96,7 @@
   "Provides documentation popups for `company-mode' using `pos-tip'."
   :global t
   (if company-quickhelp-mode
-      (push 'company-quickhelp-frontend company-frontends)
+      (add-to-list 'company-frontends 'company-quickhelp-frontend :append)
     (setq company-frontends
           (delq 'company-quickhelp-frontend company-frontends))
     (company-quickhelp--cancel-timer)))
