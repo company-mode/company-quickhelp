@@ -40,7 +40,8 @@
 (require 'pos-tip)
 
 (defcustom company-quickhelp-delay 0.5
-  "Delay, in seconds, before the quickhelp popup appears.")
+  "Delay, in seconds, before the quickhelp popup appears."
+  :group 'company-quickhelp)
 
 (defun company-quickhelp-frontend (command)
   "`company-mode' front-end showing documentation in a `pos-tip' popup."
