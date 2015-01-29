@@ -39,6 +39,10 @@
 (require 'company)
 (require 'pos-tip)
 
+(defgroup company-quickhelp nil
+  "Documentation popups for `company-mode'"
+  :group 'company)
+
 (defcustom company-quickhelp-delay 0.5
   "Delay, in seconds, before the quickhelp popup appears."
   :group 'company-quickhelp)
