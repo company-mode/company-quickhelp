@@ -28,11 +28,15 @@ It's available on [melpa](http://melpa.org/):
     M-x package-install company-quickhelp
 
 ## Usage
- put (company-quickhelp-mode 1) in you init.el to activate
- `company-quickhelp-mode'.
+
+To activate `company-quickhelp` add the following to your init.el
+
+```elisp
+(company-quickhelp-mode 1)
+```
 
 You can adjust the time it takes for the documentation to pop up by
-changing `company-quickhelp-delay'
+changing `company-quickhelp-delay`
 
 
 ## Is it any good?
