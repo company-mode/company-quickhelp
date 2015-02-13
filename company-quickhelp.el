@@ -45,6 +45,13 @@
 
 (defcustom company-quickhelp-delay 0.5
   "Delay, in seconds, before the quickhelp popup appears."
+  :type 'number
+  :group 'company-quickhelp)
+
+(defcustom company-quickhelp-max-lines nil
+  "When not NIL, limits the number of lines in the popup."
+  :type '(choice (integer :tag "Max lines to show in popup")
+                 (const :tag "Don't limit the number of lines shown" nil))
   :group 'company-quickhelp)
 
 (defun company-quickhelp-frontend (command)
@@ -55,27 +62,58 @@
      (company-quickhelp--cancel-timer)
      (pos-tip-hide))))
 
+(defun company-quickhelp--doc-and-meta (doc-buffer)
+  (with-current-buffer doc-buffer
+    (let ((truncated t))
+      (goto-char (point-min))
+      (if company-quickhelp-max-lines
+          (forward-line company-quickhelp-max-lines)
+        (goto-char (point-max))
+        (beginning-of-line))
+      ;; [back] appears at the end of the help buffer
+      (while (or (when (looking-at "\\[back\\]") (setq truncated nil) t)
+                 (looking-at "^\\s-*$"))
+        (forward-line -1))
+      (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
+            :truncated truncated))))
+
+(defun company-quickhelp--doc (candidate)
+  (let* ((doc-buffer (company-call-backend 'doc-buffer selected))
+         (doc-and-meta (when doc-buffer
+                         (company-quickhelp--doc-and-meta doc-buffer)))
+         (truncated (plist-get doc-and-meta :truncated))
+         (doc (plist-get doc-and-meta :doc)))
+    (unless (string= doc "")
+      (if truncated
+          (concat doc "\n\n[...]")
+        doc))))
+
+(defun company-quickhelp--dx-offset ()
+  "Offset to ensure the quickhelp popup doesn't appear above
+completion candidates."
+  (let* ((width (overlay-get ovl 'company-width))
+         (col (overlay-get ovl 'company-column))
+         (extra (- (+ width col) (company--window-width))))
+    (* (frame-char-width)
+       (- width (length company-prefix)
+          (if (< 0 extra) extra 1)))))
+
 (defun company-quickhelp--show ()
   (company-quickhelp--cancel-timer)
   (let* ((selected (nth company-selection company-candidates))
-         (doc-buffer (company-call-backend 'doc-buffer selected))
+         (doc (company-quickhelp--doc selected))
          (ovl company-pseudo-tooltip-overlay)
          (x-gtk-use-system-tooltips nil))
-    (when (and ovl doc-buffer)
+    (when (and ovl doc)
       (with-no-warnings
-        (let* ((width (overlay-get ovl 'company-width))
-               (col (overlay-get ovl 'company-column))
-               (extra (- (+ width col) (company--window-width))))
-          (pos-tip-show (with-current-buffer doc-buffer (buffer-string))
-                        nil
-                        nil
-                        nil
-                        300
-                        80
-                        nil
-                        (* (frame-char-width)
-                           (- width (length company-prefix)
-                              (if (< 0 extra) extra 1)))))))))
+        (pos-tip-show doc
+                      nil
+                      nil
+                      nil
+                      300
+                      80
+                      nil
+                      (company-quickhelp--dx-offset))))))
 
 (defvar company-quickhelp--timer nil
   "Quickhelp idle timer.")
