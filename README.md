@@ -38,6 +38,10 @@ To activate `company-quickhelp` add the following to your init.el
 You can adjust the time it takes for the documentation to pop up by
 changing `company-quickhelp-delay`
 
+## Customizing
+
+If you hit `M-x customize-group <RET> company-quickhelp <RET>` you'll
+find a few variables you can diddle.
 
 ## Is it any good?
 
