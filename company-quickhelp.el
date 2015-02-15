@@ -83,7 +83,8 @@
                (save-excursion (goto-char (point-max)) (line-number-at-pos)))
         (setq truncated nil))
       ;; [back] appears at the end of the help buffer
-      (while (or (looking-at "\\[back\\]")
+      (while (or (= (line-number-at-pos) 1)
+                 (looking-at "\\[back\\]")
                  (looking-at "^\\s-*$"))
         (forward-line -1))
       (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
