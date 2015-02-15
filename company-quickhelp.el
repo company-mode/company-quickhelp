@@ -54,6 +54,15 @@
                  (const :tag "Don't limit the number of lines shown" nil))
   :group 'company-quickhelp)
 
+(defvar company-quickhelp--timer nil
+  "Quickhelp idle timer.")
+
+(defvar company-quickhelp--original-tooltip-width nil
+  "The documentation popup breaks inexplicably when we transition
+  from a large pseudo-tooltip to a small one.  We solve this by
+  overriding `company-tooltip-minimum-width' and save the
+  original value here so we can restore it.")
+
 (defun company-quickhelp-frontend (command)
   "`company-mode' front-end showing documentation in a `pos-tip' popup."
   (pcase command
@@ -88,16 +97,6 @@
           (concat doc "\n\n[...]")
         doc))))
 
-(defun company-quickhelp--dx-offset ()
-  "Offset to ensure the quickhelp popup doesn't appear above
-completion candidates."
-  (let* ((width (overlay-get ovl 'company-width))
-         (col (overlay-get ovl 'company-column))
-         (extra (- (+ width col) (company--window-width))))
-    (* (frame-char-width)
-       (- width (length company-prefix)
-          (if (< 0 extra) extra 1)))))
-
 (defun company-quickhelp--show ()
   (company-quickhelp--cancel-timer)
   (let* ((selected (nth company-selection company-candidates))
@@ -106,17 +105,7 @@ completion candidates."
          (x-gtk-use-system-tooltips nil))
     (when (and ovl doc)
       (with-no-warnings
-        (pos-tip-show doc
-                      nil
-                      nil
-                      nil
-                      300
-                      80
-                      nil
-                      (company-quickhelp--dx-offset))))))
-
-(defvar company-quickhelp--timer nil
-  "Quickhelp idle timer.")
+        (pos-tip-show doc nil (overlay-start ovl) nil 300 80 nil nil 1)))))
 
 (defun company-quickhelp--set-timer ()
   (when (null company-quickhelp--timer)
@@ -129,15 +118,24 @@ completion candidates."
     (cancel-timer company-quickhelp--timer)
     (setq company-quickhelp--timer nil)))
 
+(defun company-quickhelp--enable ()
+  (setq company-quickhelp--original-tooltip-width company-tooltip-minimum-width
+        company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
+  (add-to-list 'company-frontends 'company-quickhelp-frontend :append))
+
+(defun company-quickhelp--disable ()
+  (company-quickhelp--cancel-timer)
+  (setq company-tooltip-minimum-width company-quickhelp--original-tooltip-width
+        company-frontends
+        (delq 'company-quickhelp-frontend company-frontends)))
+
 ;;;###autoload
 (define-minor-mode company-quickhelp-mode
   "Provides documentation popups for `company-mode' using `pos-tip'."
   :global t
   (if company-quickhelp-mode
-      (add-to-list 'company-frontends 'company-quickhelp-frontend :append)
-    (setq company-frontends
-          (delq 'company-quickhelp-frontend company-frontends))
-    (company-quickhelp--cancel-timer)))
+      (company-quickhelp--enable)
+    (company-quickhelp--disable)))
 
 (provide 'company-quickhelp)
 
