@@ -91,7 +91,8 @@
             :truncated truncated))))
 
 (defun company-quickhelp--doc (candidate)
-  (let* ((doc-buffer (company-call-backend 'doc-buffer selected))
+  (let* ((selected (nth company-selection company-candidates))
+         (doc-buffer (company-call-backend 'doc-buffer selected))
          (doc-and-meta (when doc-buffer
                          (company-quickhelp--doc-and-meta doc-buffer)))
          (truncated (plist-get doc-and-meta :truncated))
