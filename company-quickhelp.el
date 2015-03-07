@@ -90,9 +90,8 @@
       (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
             :truncated truncated))))
 
-(defun company-quickhelp--doc (candidate)
-  (let* ((selected (nth company-selection company-candidates))
-         (doc-buffer (company-call-backend 'doc-buffer selected))
+(defun company-quickhelp--doc (selected)
+  (let* ((doc-buffer (company-call-backend 'doc-buffer selected))
          (doc-and-meta (when doc-buffer
                          (company-quickhelp--doc-and-meta doc-buffer)))
          (truncated (plist-get doc-and-meta :truncated))
