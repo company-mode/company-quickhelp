@@ -6,7 +6,7 @@
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24") (company "0.8.9") (pos-tip "0.4.6"))
+;; Package-Requires: ((emacs "24.4") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -122,12 +122,17 @@
     (cancel-timer company-quickhelp--timer)
     (setq company-quickhelp--timer nil)))
 
+(defun company-quickhelp-hide ()
+  (company-cancel))
+
 (defun company-quickhelp--enable ()
+  (add-hook 'focus-out-hook #'company-quickhelp-hide)
   (setq company-quickhelp--original-tooltip-width company-tooltip-minimum-width
         company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
   (add-to-list 'company-frontends 'company-quickhelp-frontend :append))
 
 (defun company-quickhelp--disable ()
+  (remove-hook 'focus-out-hook #'company-quickhelp-hide)
   (company-quickhelp--cancel-timer)
   (setq company-tooltip-minimum-width company-quickhelp--original-tooltip-width
         company-frontends
