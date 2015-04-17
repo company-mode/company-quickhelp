@@ -5,7 +5,7 @@
 ;; Author: Lars Andersen <expez@expez.com>
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
-;; Version: 0.1
+;; Version: 1.0
 ;; Package-Requires: ((emacs "24.4") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
