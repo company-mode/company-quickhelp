@@ -90,16 +90,24 @@
       (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
             :truncated truncated))))
 
+(defun company-quickhelp--completing-read (prompt candidates &rest rest)
+  "`cider', and probably other libraries, prompt the user to
+resolve ambiguous documentation requests.  Instead of failing we
+just grab the first candidate and press forward."
+  (first candidates))
+
 (defun company-quickhelp--doc (selected)
-  (let* ((doc-buffer (company-call-backend 'doc-buffer selected))
-         (doc-and-meta (when doc-buffer
-                         (company-quickhelp--doc-and-meta doc-buffer)))
-         (truncated (plist-get doc-and-meta :truncated))
-         (doc (plist-get doc-and-meta :doc)))
-    (unless (string= doc "")
-      (if truncated
-          (concat doc "\n\n[...]")
-        doc))))
+  (cl-letf (((symbol-function 'completing-read)
+             #'company-quickhelp-completing-read))
+    (let* ((doc-buffer (company-call-backend 'doc-buffer selected))
+           (doc-and-meta (when doc-buffer
+                           (company-quickhelp--doc-and-meta doc-buffer)))
+           (truncated (plist-get doc-and-meta :truncated))
+           (doc (plist-get doc-and-meta :doc)))
+      (unless (string= doc "")
+        (if truncated
+            (concat doc "\n\n[...]")
+          doc)))))
 
 (defun company-quickhelp--show ()
   (company-quickhelp--cancel-timer)
