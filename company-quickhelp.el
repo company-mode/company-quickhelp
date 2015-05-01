@@ -98,7 +98,7 @@ just grab the first candidate and press forward."
 
 (defun company-quickhelp--doc (selected)
   (cl-letf (((symbol-function 'completing-read)
-             #'company-quickhelp-completing-read))
+             #'company-quickhelp--completing-read))
     (let* ((doc-buffer (company-call-backend 'doc-buffer selected))
            (doc-and-meta (when doc-buffer
                            (company-quickhelp--doc-and-meta doc-buffer)))
