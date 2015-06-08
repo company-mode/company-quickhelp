@@ -77,8 +77,8 @@
       (goto-char (point-min))
       (if company-quickhelp-max-lines
           (forward-line company-quickhelp-max-lines)
-        (goto-char (point-max))
-        (beginning-of-line))
+        (goto-char (point-max)))
+      (beginning-of-line)
       (when (= (line-number-at-pos)
                (save-excursion (goto-char (point-max)) (line-number-at-pos)))
         (setq truncated nil))
