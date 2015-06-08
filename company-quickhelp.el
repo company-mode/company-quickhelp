@@ -84,8 +84,8 @@
         (setq truncated nil))
       ;; [back] appears at the end of the help buffer
       (while (and (not (= (line-number-at-pos) 1))
-                  (or (looking-at "\\[back\\]")
-                      (looking-at "^\\s-*$")))
+                  (or (looking-at-p "\\[back\\]")
+                      (looking-at-p "^\\s-*$")))
         (forward-line -1))
       (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
             :truncated truncated))))
