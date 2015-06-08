@@ -85,6 +85,7 @@
       ;; [back] appears at the end of the help buffer
       (while (and (not (= (line-number-at-pos) 1))
                   (or (looking-at-p "\\[back\\]")
+                      (looking-at-p "\\[source\\]")
                       (looking-at-p "^\\s-*$")))
         (forward-line -1))
       (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
