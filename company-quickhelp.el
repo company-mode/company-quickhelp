@@ -5,7 +5,7 @@
 ;; Author: Lars Andersen <expez@expez.com>
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
-;; Version: 1.0.1
+;; Version: 1.1.1
 ;; Package-Requires: ((emacs "24.4") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
@@ -134,15 +134,22 @@ just grab the first candidate and press forward."
 (defun company-quickhelp-hide ()
   (company-cancel))
 
+(defun company-quickhelp--ensure-compatibility ()
+  (cond
+   ((or (not (fboundp 'x-hide-tip))
+        (not (fboundp 'x-show-tip)))
+    (error "Company-quickhelp doesn't work on your system.
+Most likely this means you're on a mac with an Emacs build using Cocoa instead of X."))
+   ((or (null window-system)
+        (eq window-system 'pc))
+    (error "Company-quickhelp doesn't work in the terminal!"))))
+
 (defun company-quickhelp--enable ()
-  (if (or (not (fboundp 'x-hide-tip))
-          (not (fboundp 'x-show-tip)))
-      (error "Company-quickhelp doesn't work on your system.
-Most likely this means you're on a mac with an Emacs build using Cocoa instead of X.")
-    (add-hook 'focus-out-hook #'company-quickhelp-hide)
-    (setq company-quickhelp--original-tooltip-width company-tooltip-minimum-width
-          company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
-    (add-to-list 'company-frontends 'company-quickhelp-frontend :append)))
+  (company-quickhelp--ensure-compatibility)
+  (add-hook 'focus-out-hook #'company-quickhelp-hide)
+  (setq company-quickhelp--original-tooltip-width company-tooltip-minimum-width
+        company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
+  (add-to-list 'company-frontends 'company-quickhelp-frontend :append))
 
 (defun company-quickhelp--disable ()
   (remove-hook 'focus-out-hook #'company-quickhelp-hide)
