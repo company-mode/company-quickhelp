@@ -111,6 +111,7 @@ just grab the first candidate and press forward."
           doc)))))
 
 (defun company-quickhelp--show ()
+  (company-quickhelp--ensure-compatibility)
   (company-quickhelp--cancel-timer)
   (let* ((selected (nth company-selection company-candidates))
          (doc (company-quickhelp--doc selected))
@@ -135,6 +136,8 @@ just grab the first candidate and press forward."
   (company-cancel))
 
 (defun company-quickhelp--ensure-compatibility ()
+  ;; Originally this code was in `company-quickhelp-enable' but that
+  ;; caused trouble for --daemon users reported in #16.
   (cond
    ((or (not (fboundp 'x-hide-tip))
         (not (fboundp 'x-show-tip)))
@@ -145,7 +148,6 @@ Most likely this means you're on a mac with an Emacs build using Cocoa instead o
     (error "Company-quickhelp doesn't work in the terminal!"))))
 
 (defun company-quickhelp--enable ()
-  (company-quickhelp--ensure-compatibility)
   (add-hook 'focus-out-hook #'company-quickhelp-hide)
   (setq company-quickhelp--original-tooltip-width company-tooltip-minimum-width
         company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
