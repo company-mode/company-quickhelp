@@ -116,10 +116,12 @@ just grab the first candidate and press forward."
   (let* ((selected (nth company-selection company-candidates))
          (doc (company-quickhelp--doc selected))
          (ovl company-pseudo-tooltip-overlay)
+         (overlay-width (* (frame-char-width) (if ovl (overlay-get ovl 'company-width) 0)))
+         (overlay-position (* (frame-char-width) (- (if ovl (overlay-get ovl 'company-column) 1) 1)))
          (x-gtk-use-system-tooltips nil))
     (when (and ovl doc)
       (with-no-warnings
-        (pos-tip-show doc nil (overlay-start ovl) nil 300 80 nil nil 1)))))
+        (pos-tip-show doc nil (overlay-start ovl) nil 300 80 nil (+ overlay-width overlay-position) 1)))))
 
 (defun company-quickhelp--set-timer ()
   (when (null company-quickhelp--timer)
