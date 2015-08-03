@@ -37,6 +37,12 @@ To activate `company-quickhelp` add the following to your `init.el`:
 You can adjust the time it takes for the documentation to pop up by
 changing `company-quickhelp-delay`.
 
+If you don't want the help popup to appear automatically, but prefer
+it to the popup help buffer provided by
+[company](https://github.com/company-mode), you can set
+`company-quickhelp-delay` to `nil` and manually trigger the popup with
+`M-h`.
+
 ## Customizing
 
 If you hit `M-x customize-group <RET> company-quickhelp <RET>` you'll

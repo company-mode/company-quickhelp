@@ -5,7 +5,7 @@
 ;; Author: Lars Andersen <expez@expez.com>
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
-;; Version: 1.1.2
+;; Version: 1.2.0
 ;; Package-Requires: ((emacs "24.4") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
@@ -44,8 +44,12 @@
   :group 'company)
 
 (defcustom company-quickhelp-delay 0.5
-  "Delay, in seconds, before the quickhelp popup appears."
-  :type 'number
+  "Delay, in seconds, before the quickhelp popup appears.
+
+If set to nil the popup won't automatically appear, but can still
+be triggered manually using `company-quickhelp-show'."
+  :type '(choice (number :tag "Delay in seconds")
+                 (const :tag "Don't popup help automatically" nil))
   :group 'company-quickhelp)
 
 (defcustom company-quickhelp-max-lines nil
@@ -53,6 +57,12 @@
   :type '(choice (integer :tag "Max lines to show in popup")
                  (const :tag "Don't limit the number of lines shown" nil))
   :group 'company-quickhelp)
+
+(defvar company-quickhelp-mode-map
+  (let ((keymap (make-sparse-keymap)))
+    (define-key keymap (kbd "M-h") #'company-quickhelp-manual-begin)
+    keymap)
+  "The keymap used by `company-quickhelp'.")
 
 (defvar company-quickhelp--timer nil
   "Quickhelp idle timer.")
@@ -66,9 +76,11 @@
 (defun company-quickhelp-frontend (command)
   "`company-mode' front-end showing documentation in a `pos-tip' popup."
   (pcase command
-    (`post-command (company-quickhelp--set-timer))
+    (`post-command (when company-quickhelp-delay
+                     (company-quickhelp--set-timer)))
     (`hide
-     (company-quickhelp--cancel-timer)
+     (when company-quickhelp-delay
+       (company-quickhelp--cancel-timer))
      (pos-tip-hide))))
 
 (defun company-quickhelp--doc-and-meta (doc-buffer)
@@ -109,6 +121,17 @@ just grab the first candidate and press forward."
         (if truncated
             (concat doc "\n\n[...]")
           doc)))))
+
+(defun company-quickhelp-manual-begin ()
+  "Manually trigger the `company-quickhelp' popup for the
+currently active `company' completion candidate."
+  (interactive)
+  ;; This might seem a bit roundabout, but when I attempted to call
+  ;; `company-quickhelp--show' in a more direct manner it trigger a
+  ;; redisplay of company's list of completion candidates which looked
+  ;; quite weird.
+  (let ((company-quickhelp-delay 0.01))
+    (company-quickhelp--set-timer)))
 
 (defun company-quickhelp--show ()
   (company-quickhelp--ensure-compatibility)
@@ -168,7 +191,7 @@ Most likely this means you're on a mac with an Emacs build using Cocoa instead o
 ;;;###autoload
 (define-minor-mode company-quickhelp-mode
   "Provides documentation popups for `company-mode' using `pos-tip'."
-  :global t
+  :global t :keymap company-quickhelp-mode-map
   (if company-quickhelp-mode
       (company-quickhelp--enable)
     (company-quickhelp--disable)))
