@@ -146,11 +146,11 @@ just grab the first candidate and press forward."
   (cond
    ((or (not (fboundp 'x-hide-tip))
         (not (fboundp 'x-show-tip)))
-    (error "Company-quickhelp doesn't work on your system.
+    (user-error "Company-quickhelp doesn't work on your system.
 Most likely this means you're on a mac with an Emacs build using Cocoa instead of X."))
    ((or (null window-system)
         (eq window-system 'pc))
-    (error "Company-quickhelp doesn't work in the terminal!"))))
+    (user-error "Company-quickhelp doesn't work in the terminal!"))))
 
 (defun company-quickhelp--enable ()
   (add-hook 'focus-out-hook #'company-quickhelp-hide)
