@@ -94,11 +94,13 @@ be triggered manually using `company-quickhelp-show'."
       (when (= (line-number-at-pos)
                (save-excursion (goto-char (point-max)) (line-number-at-pos)))
         (setq truncated nil))
-      ;; [back] appears at the end of the help buffer
       (while (and (not (= (line-number-at-pos) 1))
-                  (or (looking-at-p "\\[back\\]")
-                      (looking-at-p "\\[source\\]")
-                      (looking-at-p "^\\s-*$")))
+                  (or
+                   ;; [back] appears at the end of the help elisp help buffer
+                   (looking-at-p "\\[back\\]")
+                   ;; [source] cider's help buffer contains a link to source
+                   (looking-at-p "\\[source\\]")
+                   (looking-at-p "^\\s-*$")))
         (forward-line -1))
       (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
             :truncated truncated))))
@@ -127,7 +129,7 @@ just grab the first candidate and press forward."
 currently active `company' completion candidate."
   (interactive)
   ;; This might seem a bit roundabout, but when I attempted to call
-  ;; `company-quickhelp--show' in a more direct manner it trigger a
+  ;; `company-quickhelp--show' in a more direct manner it triggered a
   ;; redisplay of company's list of completion candidates which looked
   ;; quite weird.
   (let ((company-quickhelp-delay 0.01))
