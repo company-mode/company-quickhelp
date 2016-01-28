@@ -48,6 +48,17 @@ it to the popup help buffer provided by
 If you hit `M-x customize-group <RET> company-quickhelp <RET>` you'll
 find a few variables you can diddle.
 
+You might also want to put this in your `init.el`:
+
+```el
+(eval-after-load 'company
+  '(define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin))
+
+```
+
+This gives you a key to manually trigger the help popup, but only when
+company is doing its thing.
+
 ## Is it any good?
 
 Yes!
