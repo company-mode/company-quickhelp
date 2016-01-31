@@ -120,7 +120,8 @@ just grab the first candidate and press forward."
   (cl-letf (((symbol-function 'completing-read)
              #'company-quickhelp--completing-read))
     (let* ((doc (company-call-backend 'doc-buffer selected))
-           (doc-and-meta (company-quickhelp--doc-and-meta doc))
+           (doc-and-meta (when doc
+                           (company-quickhelp--doc-and-meta doc)))
            (truncated (plist-get doc-and-meta :truncated))
            (doc (plist-get doc-and-meta :doc)))
       (unless (string= doc "")
