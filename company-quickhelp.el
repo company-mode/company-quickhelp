@@ -38,6 +38,7 @@
 ;;; Code:
 (require 'company)
 (require 'pos-tip)
+(require 'cl-lib)
 
 (defgroup company-quickhelp nil
   "Documentation popups for `company-mode'"
@@ -114,7 +115,7 @@ be triggered manually using `company-quickhelp-show'."
   "`cider', and probably other libraries, prompt the user to
 resolve ambiguous documentation requests.  Instead of failing we
 just grab the first candidate and press forward."
-  (first candidates))
+  (car candidates))
 
 (defun company-quickhelp--doc (selected)
   (cl-letf (((symbol-function 'completing-read)
