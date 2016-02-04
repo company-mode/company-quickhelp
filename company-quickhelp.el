@@ -89,7 +89,7 @@ be triggered manually using `company-quickhelp-show'."
   ;; cons containing the doc buffer and a position at which to start
   ;; reading.
   (let ((doc-buffer (if (consp doc) (car doc) doc))
-        (doc-begin (when (consp doc) (cadr doc))))
+        (doc-begin (when (consp doc) (cdr doc))))
     (with-current-buffer doc-buffer
       (let ((truncated t))
         (goto-char (or doc-begin (point-min)))
