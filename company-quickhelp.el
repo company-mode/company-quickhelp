@@ -68,7 +68,7 @@ be triggered manually using `company-quickhelp-show'."
 (defvar company-quickhelp--timer nil
   "Quickhelp idle timer.")
 
-(defvar company-quickhelp--original-tooltip-width nil
+(defvar company-quickhelp--original-tooltip-width company-tooltip-minimum-width
   "The documentation popup breaks inexplicably when we transition
   from a large pseudo-tooltip to a small one.  We solve this by
   overriding `company-tooltip-minimum-width' and save the
