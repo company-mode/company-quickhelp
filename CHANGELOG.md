@@ -1,6 +1,8 @@
 # Changelog
 
-## master (unreleased)
+##  master (unreleased)
+
+### 1.3.0 2016-02-11
 
 * Fix an issue where `company-tooltip-minimum-width` was set to `nil` when user disabled the mode without first enabling it.
 * [#28](https://github.com/expez/company-quickhelp/issues/28)  Handle doc backends returning `(doc-buffer . start-pos)`.
