@@ -5,7 +5,7 @@
 ;; Author: Lars Andersen <expez@expez.com>
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
-;; Version: 1.3.0
+;; Version: 1.4.0
 ;; Package-Requires: ((emacs "24.4") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
@@ -58,12 +58,6 @@ be triggered manually using `company-quickhelp-show'."
   :type '(choice (integer :tag "Max lines to show in popup")
                  (const :tag "Don't limit the number of lines shown" nil))
   :group 'company-quickhelp)
-
-(defvar company-quickhelp-mode-map
-  (let ((keymap (make-sparse-keymap)))
-    (define-key keymap (kbd "M-h") #'company-quickhelp-manual-begin)
-    keymap)
-  "The keymap used by `company-quickhelp'.")
 
 (defvar company-quickhelp--timer nil
   "Quickhelp idle timer.")
@@ -199,7 +193,7 @@ Most likely this means you're on a mac with an Emacs build using Cocoa instead o
 ;;;###autoload
 (define-minor-mode company-quickhelp-mode
   "Provides documentation popups for `company-mode' using `pos-tip'."
-  :global t :keymap company-quickhelp-mode-map
+  :global t
   (if company-quickhelp-mode
       (company-quickhelp--enable)
     (company-quickhelp--disable)))
