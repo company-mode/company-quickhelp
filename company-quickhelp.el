@@ -1,6 +1,6 @@
 ;;; company-quickhelp.el --- Popup documentation for completion candidates
 
-;; Copyright (C) 2015, Lars Andersen
+;; Copyright (C) 2016, Lars Andersen
 
 ;; Author: Lars Andersen <expez@expez.com>
 ;; URL: https://www.github.com/expez/company-quickhelp
