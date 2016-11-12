@@ -44,6 +44,11 @@
   "Documentation popups for `company-mode'"
   :group 'company)
 
+(defcustom company-quickhelp-use-propertized-text nil
+  "Allow the text to have properties like color, font size, etc."
+  :type '(choice (boolean :tag "Allow"))
+  :group 'company-quickhelp)
+
 (defcustom company-quickhelp-delay 0.5
   "Delay, in seconds, before the quickhelp popup appears.
 
@@ -140,6 +145,8 @@ currently active `company' completion candidate."
   (company-quickhelp--cancel-timer)
   (let* ((selected (nth company-selection company-candidates))
          (doc (company-quickhelp--doc selected))
+         (frame (window-frame (selected-window)))
+         (w-h (pos-tip-string-width-height doc))
          (ovl company-pseudo-tooltip-overlay)
          (overlay-width (* (frame-char-width)
                            (if ovl (overlay-get ovl 'company-width) 0)))
@@ -148,8 +155,13 @@ currently active `company' completion candidate."
          (x-gtk-use-system-tooltips nil))
     (when (and ovl doc)
       (with-no-warnings
-        (pos-tip-show doc nil (overlay-start ovl) nil 300 80 nil
-                      (+ overlay-width overlay-position) 1)))))
+        (if company-quickhelp-use-propertized-text
+            (pos-tip-show-no-propertize (concat "no-propertize" doc) nil (overlay-start ovl) nil 300
+                                        (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
+                                        (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
+                                        nil (+ overlay-width overlay-position) 1)
+          (pos-tip-show (concat "pos-tip-show" doc) nil (overlay-start ovl) nil 300 80 nil
+                        (+ overlay-width overlay-position) 1))))))
 
 (defun company-quickhelp--set-timer ()
   (when (null company-quickhelp--timer)
