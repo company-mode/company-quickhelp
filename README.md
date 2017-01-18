@@ -47,6 +47,7 @@ it to the popup help buffer provided by
 
 If you hit `M-x customize-group <RET> company-quickhelp <RET>` you'll
 find a few variables you can diddle.
+For instance, you can change the help popup text background and foreground colors.
 
 You might also want to put this in your `init.el`:
 

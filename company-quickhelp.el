@@ -64,14 +64,16 @@ be triggered manually using `company-quickhelp-show'."
                  (const :tag "Don't limit the number of lines shown" nil))
   :group 'company-quickhelp)
 
-(defcustom company-quickhelp-color-foreground "black"
+(defcustom company-quickhelp-color-foreground nil
   "Popup text foreground color."
-  :type '(color)
+  :type '(choice (color)
+                 (const :tag "Default" nil))
   :group 'company-quickhelp)
 
-(defcustom company-quickhelp-color-background "yellow4"
+(defcustom company-quickhelp-color-background nil
   "Popup text background color."
-  :type '(color)
+  :type '(choice (color)
+                 (const :tag "Default" nil))
   :group 'company-quickhelp)
 
 (defvar company-quickhelp--timer nil
