@@ -18,6 +18,12 @@ which fetches the version of `pos-tip` which is located
 This version contains a few bugfixes not included in the original on
 [EmacsWiki](http://www.emacswiki.org).
 
+### What isn't
+
+Since this library relies on `pos-tip`, and I prefer libraries that do
+one thing well, `company-quickhelp` will never be extended with
+optional terminal support.
+
 ## Installation
 
 I highly recommend installing `company-quickhelp` through `package.el`.
