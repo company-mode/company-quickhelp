@@ -93,7 +93,7 @@ be triggered manually using `company-quickhelp-show'."
     (`hide
      (when company-quickhelp-delay
        (company-quickhelp--cancel-timer))
-     (pos-tip-hide))))
+     (company-quickhelp--hide))))
 
 (defun company-quickhelp--doc-and-meta (doc)
   ;; The company backend can either return a buffer with the doc or a
@@ -152,8 +152,13 @@ currently active `company' completion candidate."
   (let ((company-quickhelp-delay 0.01))
     (company-quickhelp--set-timer)))
 
+(defun company-quickhelp--hide ()
+  (when (company-quickhelp-pos-tip-available-p)
+    (pos-tip-hide)))
+
 (defun company-quickhelp--show ()
-  (company-quickhelp--ensure-compatibility)
+  (unless (company-quickhelp-pos-tip-available-p)
+    (error "company-quickhelp is not available in this emacs version or frame"))
   (company-quickhelp--cancel-timer)
   (let* ((selected (nth company-selection company-candidates))
          (doc (company-quickhelp--doc selected))
@@ -203,17 +208,13 @@ currently active `company' completion candidate."
 (defun company-quickhelp-hide ()
   (company-cancel))
 
-(defun company-quickhelp--ensure-compatibility ()
-  ;; Originally this code was in `company-quickhelp-enable' but that
-  ;; caused trouble for --daemon users reported in #16.
-  (cond
-   ((or (not (fboundp 'x-hide-tip))
-        (not (fboundp 'x-show-tip)))
-    (user-error "Company-quickhelp doesn't work on your system.
-Most likely this means you're on a mac with an Emacs build using Cocoa instead of X"))
-   ((or (null window-system)
-        (eq window-system 'pc))
-    (user-error "Company-quickhelp doesn't work in the terminal"))))
+
+(defun company-quickhelp-pos-tip-available-p ()
+  "Return t if and only if pos-tip is expected work in the current frame."
+  (and
+   (fboundp 'x-hide-tip)
+   (fboundp 'x-show-tip)
+   (not (memq window-system (list nil 'pc)))))
 
 (defun company-quickhelp--enable ()
   (add-hook 'focus-out-hook #'company-quickhelp-hide)
