@@ -178,7 +178,9 @@ currently active `company' completion candidate."
             (let* ((frame (window-frame (selected-window)))
                    (max-width (pos-tip-x-display-width frame))
                    (max-height (pos-tip-x-display-height frame))
-                   (w-h (pos-tip-string-width-height doc)))
+                   (w-h (pos-tip-string-width-height doc))
+                   (fg-bg `(,company-quickhelp-color-foreground
+                            . ,company-quickhelp-color-background)))
               (cond
                ((> (car w-h) width)
                 (setq doc (pos-tip-fill-string doc width nil 'none nil max-height)
