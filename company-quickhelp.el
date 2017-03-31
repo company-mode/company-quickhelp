@@ -76,10 +76,10 @@ be triggered manually using `company-quickhelp-show'."
                  (const :tag "Default" nil))
   :group 'company-quickhelp)
 
-(defvar company-quickhelp--timer nil
+(defvar-local company-quickhelp--timer nil
   "Quickhelp idle timer.")
 
-(defvar company-quickhelp--original-tooltip-width company-tooltip-minimum-width
+(defvar-local company-quickhelp--original-tooltip-width company-tooltip-minimum-width
   "The documentation popup breaks inexplicably when we transition
   from a large pseudo-tooltip to a small one.  We solve this by
   overriding `company-tooltip-minimum-width' and save the
@@ -217,25 +217,29 @@ currently active `company' completion candidate."
    (not (memq window-system (list nil 'pc)))))
 
 (defun company-quickhelp--enable ()
-  (add-hook 'focus-out-hook #'company-quickhelp-hide)
-  (setq company-quickhelp--original-tooltip-width company-tooltip-minimum-width
-        company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
+  (add-hook 'focus-out-hook #'company-quickhelp-hide nil t)
+  (setq-local company-quickhelp--original-tooltip-width company-tooltip-minimum-width)
+  (setq-local company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
+  (make-local-variable 'company-frontends)
   (add-to-list 'company-frontends 'company-quickhelp-frontend :append))
 
 (defun company-quickhelp--disable ()
-  (remove-hook 'focus-out-hook #'company-quickhelp-hide)
+  (remove-hook 'focus-out-hook #'company-quickhelp-hide t)
   (company-quickhelp--cancel-timer)
-  (setq company-tooltip-minimum-width company-quickhelp--original-tooltip-width
-        company-frontends
-        (delq 'company-quickhelp-frontend company-frontends)))
+  (setq-local company-tooltip-minimum-width company-quickhelp--original-tooltip-width)
+  (setq-local company-frontends (delq 'company-quickhelp-frontend company-frontends)))
 
 ;;;###autoload
-(define-minor-mode company-quickhelp-mode
+(define-minor-mode company-quickhelp-local-mode
   "Provides documentation popups for `company-mode' using `pos-tip'."
-  :global t
-  (if company-quickhelp-mode
+  :global nil
+  (if company-quickhelp-local-mode
       (company-quickhelp--enable)
     (company-quickhelp--disable)))
+
+;;;###autoload
+(define-globalized-minor-mode company-quickhelp-mode
+  company-quickhelp-local-mode company-quickhelp-local-mode)
 
 (provide 'company-quickhelp)
 
