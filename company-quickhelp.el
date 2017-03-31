@@ -5,7 +5,7 @@
 ;; Author: Lars Andersen <expez@expez.com>
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
-;; Version: 1.4.0
+;; Version: 2.1.0
 ;; Package-Requires: ((emacs "24.4") (company "0.8.9") (pos-tip "0.4.6"))
 
 ;; This file is not part of GNU Emacs.
@@ -170,8 +170,8 @@ currently active `company' completion candidate."
          (overlay-position (* (frame-char-width)
                               (- (if ovl (overlay-get ovl 'company-column) 1) 1)))
          (x-gtk-use-system-tooltips nil)
-	 (fg-bg `(,company-quickhelp-color-foreground
-		  . ,company-quickhelp-color-background)))
+         (fg-bg `(,company-quickhelp-color-foreground
+                  . ,company-quickhelp-color-background)))
     (when (and ovl doc)
       (with-no-warnings
         (if company-quickhelp-use-propertized-text
