@@ -162,7 +162,8 @@ currently active `company' completion candidate."
   (company-quickhelp--cancel-timer)
   (while-no-input
     (let* ((selected (nth company-selection company-candidates))
-           (doc (company-quickhelp--doc selected))
+           (doc (let ((inhibit-message t))
+                  (company-quickhelp--doc selected)))
            (width 80)
            (timeout 300)
            (ovl company-pseudo-tooltip-overlay)
