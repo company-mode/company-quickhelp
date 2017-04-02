@@ -2,6 +2,11 @@
 
 ##  master (unreleased)
 
+### 2.2.0 2017-04-02
+
+* [#68] Better handling of background messages
+* [#67] Abort all operations on user input, for better performance.
+
 ### 2.1.0 2017-03-31
 
 * [#66](https://github.com/expez/company-quickhelp/issues/66) Create a buffer local minor mode.
