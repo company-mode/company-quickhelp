@@ -95,6 +95,24 @@ be triggered manually using `company-quickhelp-show'."
        (company-quickhelp--cancel-timer))
      (company-quickhelp--hide))))
 
+(defun company-quickhelp--skip-footers-backwards ()
+  "Skip backwards over footers and blank lines."
+  (beginning-of-line)
+  (while (and (not (= (point-at-eol) (point-min)))
+              (or
+               ;; [back] appears at the end of the help elisp help buffer
+               (looking-at-p "\\[back\\]")
+               ;; [source] cider's help buffer contains a link to source
+               (looking-at-p "\\[source\\]")
+               (looking-at-p "^\\s-*$")))
+    (forward-line -1)))
+
+(defun company-quickhelp--goto-max-line ()
+  "Go to last line to display in popup."
+  (if company-quickhelp-max-lines
+      (forward-line company-quickhelp-max-lines)
+    (goto-char (point-max))))
+
 (defun company-quickhelp--doc-and-meta (doc)
   ;; The company backend can either return a buffer with the doc or a
   ;; cons containing the doc buffer and a position at which to start
@@ -103,23 +121,10 @@ be triggered manually using `company-quickhelp-show'."
         (doc-begin (when (consp doc) (cdr doc))))
     (with-current-buffer doc-buffer
       (setq doc-begin (or doc-begin (point-min)))
-      (let ((truncated t))
-        (goto-char doc-begin)
-        (if company-quickhelp-max-lines
-            (forward-line company-quickhelp-max-lines)
-          (goto-char (point-max)))
-        (beginning-of-line)
-        (when (= (line-number-at-pos)
-                 (save-excursion (goto-char (point-max)) (line-number-at-pos)))
-          (setq truncated nil))
-        (while (and (not (= (line-number-at-pos) 1))
-                    (or
-                     ;; [back] appears at the end of the help elisp help buffer
-                     (looking-at-p "\\[back\\]")
-                     ;; [source] cider's help buffer contains a link to source
-                     (looking-at-p "\\[source\\]")
-                     (looking-at-p "^\\s-*$")))
-          (forward-line -1))
+      (goto-char doc-begin)
+      (company-quickhelp--goto-max-line)
+      (let ((truncated (< (point-at-eol) (point-max))))
+        (company-quickhelp--skip-footers-backwards)
         (list :doc (buffer-substring-no-properties doc-begin (point-at-eol))
               :truncated truncated)))))
 
