@@ -113,20 +113,14 @@ be triggered manually using `company-quickhelp-show'."
       (forward-line company-quickhelp-max-lines)
     (goto-char (point-max))))
 
-(defun company-quickhelp--doc-and-meta (doc)
-  ;; The company backend can either return a buffer with the doc or a
-  ;; cons containing the doc buffer and a position at which to start
-  ;; reading.
-  (let ((doc-buffer (if (consp doc) (car doc) doc))
-        (doc-begin (when (consp doc) (cdr doc))))
-    (with-current-buffer doc-buffer
-      (setq doc-begin (or doc-begin (point-min)))
-      (goto-char doc-begin)
-      (company-quickhelp--goto-max-line)
-      (let ((truncated (< (point-at-eol) (point-max))))
-        (company-quickhelp--skip-footers-backwards)
-        (list :doc (buffer-substring-no-properties doc-begin (point-at-eol))
-              :truncated truncated)))))
+(defun company-quickhelp--docstring-from-buffer (start)
+  "Fetch docstring from START."
+  (goto-char start)
+  (company-quickhelp--goto-max-line)
+  (let ((truncated (< (point-at-eol) (point-max))))
+    (company-quickhelp--skip-footers-backwards)
+    (list :doc (buffer-substring-no-properties start (point-at-eol))
+          :truncated truncated)))
 
 (defun company-quickhelp--completing-read (prompt candidates &rest rest)
   "`cider', and probably other libraries, prompt the user to
@@ -134,15 +128,30 @@ resolve ambiguous documentation requests.  Instead of failing we
 just grab the first candidate and press forward."
   (car candidates))
 
+(defun company-quickhelp--fetch-docstring (backend)
+  "Fetch docstring from BACKEND."
+  (let ((quickhelp-str (company-call-backend 'quickhelp-string backend)))
+    (if (stringp quickhelp-str)
+        (with-temp-buffer
+          (insert quickhelp-str)
+          (company-quickhelp--docstring-from-buffer (point-min)))
+      (let ((doc (company-call-backend 'doc-buffer backend)))
+        (when doc
+          ;; The company backend can either return a buffer with the doc or a
+          ;; cons containing the doc buffer and a position at which to start
+          ;; reading.
+          (let ((doc-buffer (if (consp doc) (car doc) doc))
+                (doc-begin (when (consp doc) (cdr doc))))
+            (with-current-buffer doc-buffer
+              (company-quickhelp--docstring-from-buffer (or doc-begin (point-min))))))))))
+
 (defun company-quickhelp--doc (selected)
   (cl-letf (((symbol-function 'completing-read)
              #'company-quickhelp--completing-read))
-    (let* ((doc (company-call-backend 'doc-buffer selected))
-           (doc-and-meta (when doc
-                           (company-quickhelp--doc-and-meta doc)))
+    (let* ((doc-and-meta (company-quickhelp--fetch-docstring selected))
            (truncated (plist-get doc-and-meta :truncated))
            (doc (plist-get doc-and-meta :doc)))
-      (unless (string= doc "")
+      (unless (member doc '(nil ""))
         (if truncated
             (concat doc "\n\n[...]")
           doc)))))
