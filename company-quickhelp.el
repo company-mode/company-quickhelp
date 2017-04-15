@@ -102,8 +102,9 @@ be triggered manually using `company-quickhelp-show'."
   (let ((doc-buffer (if (consp doc) (car doc) doc))
         (doc-begin (when (consp doc) (cdr doc))))
     (with-current-buffer doc-buffer
+      (setq doc-begin (or doc-begin (point-min)))
       (let ((truncated t))
-        (goto-char (or doc-begin (point-min)))
+        (goto-char doc-begin)
         (if company-quickhelp-max-lines
             (forward-line company-quickhelp-max-lines)
           (goto-char (point-max)))
@@ -119,7 +120,7 @@ be triggered manually using `company-quickhelp-show'."
                      (looking-at-p "\\[source\\]")
                      (looking-at-p "^\\s-*$")))
           (forward-line -1))
-        (list :doc (buffer-substring-no-properties (point-min) (point-at-eol))
+        (list :doc (buffer-substring-no-properties doc-begin (point-at-eol))
               :truncated truncated)))))
 
 (defun company-quickhelp--completing-read (prompt candidates &rest rest)
