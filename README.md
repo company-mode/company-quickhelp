@@ -60,11 +60,14 @@ You might also want to put this in your `init.el`:
 ```el
 (eval-after-load 'company
   '(define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
-
 ```
 
 This gives you a key to manually trigger the help popup, but only when
 company is doing its thing.
+
+## Developer corner
+
+By default, `company-quickhelp` displays the contents of the buffer returned by a `doc-buffer` backend call.  To override this default, backends should respond to the `quickhelp-string` command with a string to display instead of the contents of `doc-buffer`.
 
 ## Is it any good?
 
