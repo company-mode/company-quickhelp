@@ -37,7 +37,7 @@ It's available on [MELPA](http://melpa.org/):
 To activate `company-quickhelp` add the following to your `init.el`:
 
 ```elisp
-(company-quickhelp-mode 1)
+(company-quickhelp-mode)
 ```
 
 You can adjust the time it takes for the documentation to pop up by
