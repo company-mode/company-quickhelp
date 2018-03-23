@@ -29,7 +29,7 @@
 ;; candidate will pop up after `company-quickhelp-idle-delay' seconds.
 
 ;;; Usage:
-;;  put (company-quickhelp-mode 1) in your init.el to activate
+;;  put (company-quickhelp-mode) in your init.el to activate
 ;;  `company-quickhelp-mode'.
 
 ;; You can adjust the time it takes for the documentation to pop up by
