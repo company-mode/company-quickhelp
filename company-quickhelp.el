@@ -76,6 +76,9 @@ be triggered manually using `company-quickhelp-show'."
                  (const :tag "Default" nil))
   :group 'company-quickhelp)
 
+(defface company-quickhelp '((t :inherit 'tooltip))
+  "Face used by company-quickhelp when using propertized text.")
+
 (defvar-local company-quickhelp--timer nil
   "Quickhelp idle timer.")
 
@@ -203,6 +206,7 @@ currently active `company' completion candidate."
                         (> (cdr w-h) max-height))
                     (setq doc (pos-tip-truncate-string doc max-width max-height)
                           w-h (pos-tip-string-width-height doc))))
+                  (put-text-property 0 (- (length doc) 1) 'face 'company-quickhelp doc)
                   (pos-tip-show-no-propertize doc fg-bg (overlay-start ovl) nil timeout
                                               (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
                                               (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
