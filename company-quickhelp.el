@@ -211,7 +211,8 @@ currently active `company' completion candidate."
                             (+ overlay-width overlay-position) 1))))))))
 
 (defun company-quickhelp--set-timer ()
-  (when (null company-quickhelp--timer)
+  (when (or (null company-quickhelp--timer)
+        (eq this-command #'company-quickhelp-manual-begin))
     (setq company-quickhelp--timer
           (run-with-idle-timer company-quickhelp-delay nil
                                'company-quickhelp--show))))
