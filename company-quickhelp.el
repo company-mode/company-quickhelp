@@ -6,7 +6,7 @@
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
 ;; Version: 2.2.0
-;; Package-Requires: ((emacs "24.3") (company "0.8.9") (pos-tip "0.4.6"))
+;; Package-Requires: ((emacs "24.3") (company "0.8.9") (pos-tip "0.4.6") (posframe "20190608"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -38,6 +38,7 @@
 ;;; Code:
 (require 'company)
 (require 'pos-tip)
+(require 'posframe)
 (require 'cl-lib)
 
 (defgroup company-quickhelp nil
@@ -56,6 +57,12 @@ If set to nil the popup won't automatically appear, but can still
 be triggered manually using `company-quickhelp-show'."
   :type '(choice (number :tag "Delay in seconds")
                  (const :tag "Don't popup help automatically" nil))
+  :group 'company-quickhelp)
+
+(defcustom company-quickhelp-tooltip 'pos-tip
+  "Set the tooltip used to show doc."
+  :type '(choice (const :tag "pos-tip" pos-tip)
+                 (const :tag "posframe" posframe))
   :group 'company-quickhelp)
 
 (defcustom company-quickhelp-max-lines nil
@@ -85,11 +92,24 @@ be triggered manually using `company-quickhelp-show'."
   overriding `company-tooltip-minimum-width' and save the
   original value here so we can restore it.")
 
+(defvar company-quickhelp-posframe-buffer " *company-quickhelp-posframe-buffer*"
+  "The buffer which used by posframe.")
+
+(defvar company-quickhelp-show-params
+  (list :internal-border-width 3
+        :timeout 300
+        :internal-border-color "gray50"
+        :no-properties nil
+        :poshandler nil)
+  "List of parameters passed to `posframe-show'.")
+
 (defun company-quickhelp-frontend (command)
   "`company-mode' front-end showing documentation in a `pos-tip' popup."
   (pcase command
     (`post-command (when company-quickhelp-delay
-                     (company-quickhelp--set-timer)))
+                     (company-quickhelp--set-timer))
+                   (when (eq company-quickhelp-tooltip 'posframe)
+                     (company-quickhelp--hide)))
     (`hide
      (when company-quickhelp-delay
        (company-quickhelp--cancel-timer))
@@ -168,10 +188,22 @@ currently active `company' completion candidate."
     (company-quickhelp--set-timer)))
 
 (defun company-quickhelp--hide ()
-  (when (company-quickhelp-pos-tip-available-p)
-    (pos-tip-hide)))
+  (cond
+   ((and (eq company-quickhelp-tooltip 'pos-tip)
+         (company-quickhelp-pos-tip-available-p))
+    (pos-tip-hide))
+   ((and (eq company-quickhelp-tooltip 'posframe)
+         (posframe-workable-p))
+    (posframe-hide company-quickhelp-posframe-buffer))))
 
 (defun company-quickhelp--show ()
+  (cond
+   ((eq company-quickhelp-tooltip 'pos-tip)
+    (company-quickhelp--show-with-pos-tip))
+   ((eq company-quickhelp-tooltip 'posframe)
+    (company-quickhelp--show-with-posframe))))
+
+(defun company-quickhelp--show-with-pos-tip ()
   (when (company-quickhelp-pos-tip-available-p)
     (company-quickhelp--cancel-timer)
     (while-no-input
@@ -210,9 +242,44 @@ currently active `company' completion candidate."
               (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
                             (+ overlay-width overlay-position) 1))))))))
 
+(defun company-quickhelp--show-with-posframe ()
+  (when (posframe-workable-p)
+    (company-quickhelp--cancel-timer)
+    (while-no-input
+      (let* ((selected (nth company-selection company-candidates))
+             (ovl company-pseudo-tooltip-overlay)
+             (overlay-width
+              (* (frame-char-width)
+                 (if ovl (overlay-get ovl 'company-width) 0)))
+             (overlay-position
+              (* (frame-char-width)
+                 (- (if ovl (overlay-get ovl 'company-column) 1) 1)))
+             (doc (let ((inhibit-message t))
+                    (company-quickhelp--doc selected)))
+             (company-posframe-p
+              (and (featurep 'company-posframe)
+                   company-posframe-mode)))
+        (when doc
+          (apply #'posframe-show
+                 company-quickhelp-posframe-buffer
+                 :string (propertize doc 'face '(:height 100))
+                 :background-color company-quickhelp-color-background
+                 :foreground-color company-quickhelp-color-foreground
+                 :position
+                 (if company-posframe-p
+                     (with-current-buffer company-posframe-buffer
+                       (let ((pos posframe--last-posframe-pixel-position))
+                         (cons (+ (car pos) (frame-pixel-width posframe--frame))
+                               (cdr pos))))
+                   (overlay-start ovl))
+                 :x-pixel-offset
+                 (unless company-posframe-p
+                   (+ overlay-width overlay-position))
+                 company-quickhelp-show-params))))))
+
 (defun company-quickhelp--set-timer ()
   (when (or (null company-quickhelp--timer)
-        (eq this-command #'company-quickhelp-manual-begin))
+            (eq this-command #'company-quickhelp-manual-begin))
     (setq company-quickhelp--timer
           (run-with-idle-timer company-quickhelp-delay nil
                                'company-quickhelp--show))))
