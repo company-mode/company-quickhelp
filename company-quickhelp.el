@@ -6,7 +6,7 @@
 ;; URL: https://www.github.com/expez/company-quickhelp
 ;; Keywords: company popup documentation quickhelp
 ;; Version: 2.2.0
-;; Package-Requires: ((emacs "24.3") (company "0.8.9") (pos-tip "0.4.6"))
+;; Package-Requires: ((emacs "24.3") (company "0.8.9") (pos-tip "0.4.6") (popup "0.5.3"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -37,6 +37,7 @@
 
 ;;; Code:
 (require 'company)
+(require 'popup)
 (require 'pos-tip)
 (require 'cl-lib)
 
@@ -203,16 +204,25 @@ currently active `company' completion candidate."
                         (> (cdr w-h) max-height))
                     (setq doc (pos-tip-truncate-string doc max-width max-height)
                           w-h (pos-tip-string-width-height doc))))
-                  (pos-tip-show-no-propertize doc fg-bg (overlay-start ovl) nil timeout
-                                              (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
-                                              (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
-                                              nil (+ overlay-width overlay-position) 1))
-              (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
-                            (+ overlay-width overlay-position) 1))))))))
+                  (if (display-graphic-p)
+                      (pos-tip-show-no-propertize doc fg-bg (overlay-start ovl) nil timeout
+                                                  (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
+                                                  (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
+                                                  nil (+ overlay-width overlay-position) 1)
+                    (popup-tip doc :point (overlay-start ovl)
+                               :width (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
+                               :height (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
+                               :nostrip nil)))
+              (if (display-graphic-p)
+                  (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
+                                (+ overlay-width overlay-position) 1)
+                (popup-tip doc :point (overlay-start ovl)
+                           :width width
+                           :nostrip t)))))))))
 
 (defun company-quickhelp--set-timer ()
   (when (or (null company-quickhelp--timer)
-        (eq this-command #'company-quickhelp-manual-begin))
+            (eq this-command #'company-quickhelp-manual-begin))
     (setq company-quickhelp--timer
           (run-with-idle-timer company-quickhelp-delay nil
                                'company-quickhelp--show))))
@@ -230,8 +240,7 @@ currently active `company' completion candidate."
   "Return t if and only if pos-tip is expected work in the current frame."
   (and
    (fboundp 'x-hide-tip)
-   (fboundp 'x-show-tip)
-   (not (memq window-system (list nil 'pc)))))
+   (fboundp 'x-show-tip)))
 
 (defun company-quickhelp--enable ()
   (add-hook 'focus-out-hook #'company-quickhelp-hide nil t)
