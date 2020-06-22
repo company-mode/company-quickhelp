@@ -44,6 +44,16 @@
   "Documentation popups for `company-mode'"
   :group 'company)
 
+(defgroup company-quickhelp-faces nil
+  "The faces of `company-quickhelp'."
+  :group 'company-quickhelp
+  :group 'faces)
+
+(defface company-quickhelp-face
+  '((t (:inherit tooltip)))
+  "Face used for displaying the tooltip."
+  :group 'company-quickhelp-faces)
+
 (defcustom company-quickhelp-use-propertized-text nil
   "Allow the text to have properties like color, font size, etc."
   :type '(choice (boolean :tag "Allow"))
@@ -191,19 +201,20 @@ currently active `company' completion candidate."
         (when (and ovl doc)
           (with-no-warnings
             (if company-quickhelp-use-propertized-text
-                (let* ((frame (window-frame (selected-window)))
+                (let* ((str (propertize doc 'face 'company-quickhelp-face))
+                       (frame (window-frame (selected-window)))
                        (max-width (pos-tip-x-display-width frame))
                        (max-height (pos-tip-x-display-height frame))
-                       (w-h (pos-tip-string-width-height doc)))
+                       (w-h (pos-tip-string-width-height str)))
                   (cond
                    ((> (car w-h) width)
-                    (setq doc (pos-tip-fill-string doc width nil 'none nil max-height)
-                          w-h (pos-tip-string-width-height doc)))
+                    (setq str (pos-tip-fill-string str width nil 'none nil max-height)
+                          w-h (pos-tip-string-width-height str)))
                    ((or (> (car w-h) max-width)
                         (> (cdr w-h) max-height))
-                    (setq doc (pos-tip-truncate-string doc max-width max-height)
-                          w-h (pos-tip-string-width-height doc))))
-                  (pos-tip-show-no-propertize doc fg-bg (overlay-start ovl) nil timeout
+                    (setq str (pos-tip-truncate-string str max-width max-height)
+                          w-h (pos-tip-string-width-height str))))
+                    (pos-tip-show-no-propertize str fg-bg (overlay-start ovl) nil timeout
                                               (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
                                               (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
                                               nil (+ overlay-width overlay-position) 1))
