@@ -122,7 +122,7 @@ be triggered manually using `company-quickhelp-show'."
   (company-quickhelp--goto-max-line)
   (let ((truncated (< (point-at-eol) (point-max))))
     (company-quickhelp--skip-footers-backwards)
-    (list :doc (buffer-substring-no-properties start (point-at-eol))
+    (list :doc (buffer-substring start (point-at-eol))
           :truncated truncated)))
 
 (defun company-quickhelp--completing-read (prompt candidates &rest rest)
