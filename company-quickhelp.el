@@ -184,7 +184,8 @@ currently active `company' completion candidate."
              (overlay-width (* (frame-char-width)
                                (if ovl (overlay-get ovl 'company-width) 0)))
              (overlay-position (* (frame-char-width)
-                                  (- (if ovl (overlay-get ovl 'company-column) 1) 1)))
+                                  (+ (- (if ovl (overlay-get ovl 'company-column) 1) 1)
+                                     (line-number-display-width) 2)))
              (x-gtk-use-system-tooltips nil)
              (fg-bg `(,company-quickhelp-color-foreground
                       . ,company-quickhelp-color-background)))
