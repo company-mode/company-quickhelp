@@ -40,6 +40,9 @@
 (require 'pos-tip)
 (require 'cl-lib)
 
+;; To avoid warnings in Emacs < 26.
+(declare-function line-number-display-width "indent.c")
+
 (defgroup company-quickhelp nil
   "Documentation popups for `company-mode'"
   :group 'company)
@@ -184,7 +187,9 @@ currently active `company' completion candidate."
              (overlay-width (* (frame-char-width)
                                (if ovl (overlay-get ovl 'company-width) 0)))
              (overlay-position (* (frame-char-width)
-                                  (- (if ovl (overlay-get ovl 'company-column) 1) 1)))
+                                  (+ (- (if ovl (overlay-get ovl 'company-column) 1) 1)
+                                     (if (bound-and-true-p display-line-numbers)
+                                       (+ (line-number-display-width) 2) 0))))
              (x-gtk-use-system-tooltips nil)
              (fg-bg `(,company-quickhelp-color-foreground
                       . ,company-quickhelp-color-background)))
