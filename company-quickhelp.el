@@ -40,6 +40,9 @@
 (require 'pos-tip)
 (require 'cl-lib)
 
+;; To avoid warnings in Emacs < 26.
+(declare-function line-number-display-width "indent.c")
+
 (defgroup company-quickhelp nil
   "Documentation popups for `company-mode'"
   :group 'company)
