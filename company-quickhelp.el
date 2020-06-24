@@ -199,10 +199,16 @@ currently active `company' completion candidate."
              (overlay-position (* (frame-char-width)
                                   (+ (- (if ovl (overlay-get ovl 'company-column) 1) 1)
                                      (if (bound-and-true-p display-line-numbers)
-                                         (+ (line-number-display-width) 2) 0))))
+                                       (+ (line-number-display-width) 2) 0))))
              (x-gtk-use-system-tooltips nil)
              (fg-bg `(,company-quickhelp-color-foreground
-                      . ,company-quickhelp-color-background)))
+                      . ,company-quickhelp-color-background))
+             (pos (save-excursion
+                    (goto-char (overlay-start ovl))
+                    (line-beginning-position)))
+             (dy (if (and ovl (< (overlay-get ovl 'company-height) 0))
+                     0
+                   nil)))
         (when (and ovl doc)
           (with-no-warnings
             (if company-quickhelp-use-propertized-text
@@ -219,18 +225,13 @@ currently active `company' completion candidate."
                     (setq doc (pos-tip-truncate-string doc max-width max-height)
                           w-h (pos-tip-string-width-height doc))))
                   (let* ((str (propertize doc 'face 'company-quickhelp-face)))
-                    (pos-tip-show-no-propertize str fg-bg (overlay-start ovl) nil timeout
+                    (pos-tip-show-no-propertize str fg-bg pos nil timeout
                                                 (pos-tip-tooltip-width (car w-h) (window-font-width nil 'company-quickhelp-face))
                                                 ;;(pos-tip-tooltip-height (cdr w-h) (window-font-height nil 'company-quickhelp-face) frame) ;; height generally truncated short
                                                 nil ;; dummy height for testing
-                                                nil (+ overlay-width overlay-position) 1)))
+                                                nil (+ overlay-width overlay-position) dy)))
               (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
-                            (+ overlay-width overlay-position) 1))))))))
-
-(defun company-quickhelp--string-height (string)
-  (with-temp-buffer
-    (insert string)
-    (how-many "\n")))
+                            (+ overlay-width overlay-position) dy))))))))
 
 (defun company-quickhelp--set-timer ()
   (when (or (null company-quickhelp--timer)
