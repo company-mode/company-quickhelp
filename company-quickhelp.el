@@ -198,7 +198,7 @@ currently active `company' completion candidate."
                     (line-beginning-position)))
              (dy (if (and ovl (< (overlay-get ovl 'company-height) 0))
                      0
-                   nil)))
+                   (frame-char-height))))
         (when (and ovl doc)
           (with-no-warnings
             (if company-quickhelp-use-propertized-text
