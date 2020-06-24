@@ -192,7 +192,13 @@ currently active `company' completion candidate."
                                        (+ (line-number-display-width) 2) 0))))
              (x-gtk-use-system-tooltips nil)
              (fg-bg `(,company-quickhelp-color-foreground
-                      . ,company-quickhelp-color-background)))
+                      . ,company-quickhelp-color-background))
+             (pos (save-excursion
+                    (goto-char (overlay-start ovl))
+                    (line-beginning-position)))
+             (dy (if (and ovl (< (overlay-get ovl 'company-height) 0))
+                     0
+                   nil)))
         (when (and ovl doc)
           (with-no-warnings
             (if company-quickhelp-use-propertized-text
@@ -208,12 +214,12 @@ currently active `company' completion candidate."
                         (> (cdr w-h) max-height))
                     (setq doc (pos-tip-truncate-string doc max-width max-height)
                           w-h (pos-tip-string-width-height doc))))
-                  (pos-tip-show-no-propertize doc fg-bg (overlay-start ovl) nil timeout
+                  (pos-tip-show-no-propertize doc fg-bg pos nil timeout
                                               (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
                                               (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
-                                              nil (+ overlay-width overlay-position) 1))
-              (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
-                            (+ overlay-width overlay-position) 1))))))))
+                                              nil (+ overlay-width overlay-position) dy))
+              (pos-tip-show doc fg-bg pos nil timeout width nil
+                            (+ overlay-width overlay-position) dy))))))))
 
 (defun company-quickhelp--set-timer ()
   (when (or (null company-quickhelp--timer)
