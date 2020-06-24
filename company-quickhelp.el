@@ -218,13 +218,29 @@ currently active `company' completion candidate."
                         (> (cdr w-h) max-height))
                     (setq doc (pos-tip-truncate-string doc max-width max-height)
                           w-h (pos-tip-string-width-height doc))))
-                  (let* ((str (propertize doc 'face 'company-quickhelp-face)))
-                    (pos-tip-show-no-propertize str fg-bg (overlay-start ovl) nil timeout
-                                                (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
-                                                (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
-                                                nil (+ overlay-width overlay-position) 1)))
+                  (let* ((w-h (pos-tip-string-width-height doc))
+                         (str (propertize doc 'face 'company-quickhelp-face)))
+                    (pos-tip-show-no-propertize str ;; inconsequential
+                                                fg-bg ;; inconsequential
+                                                (overlay-start ovl) ;; makes the overlay start on the left side of the screen
+                                                nil ;; inconsequential
+                                                timeout ;; inconsequential
+                                                (pos-tip-tooltip-width (car w-h) (window-font-width nil 'company-quickhelp-face))
+                                                ;; FIXME: height is not calculated well, or at least,
+                                                ;; it is well calculated, but generally text is truncated too short
+                                                ;;(pos-tip-tooltip-height (cdr w-h) 14)
+                                                nil ;; dummy height for testing
+                                                nil ;; inconsequential
+                                                (+ overlay-width overlay-position) ;; puts the overlay right next to the company tooltip
+                                                1 ;; quirk, the overlay-start is 1 y pos lower than needed
+                                                )))
               (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
                             (+ overlay-width overlay-position) 1))))))))
+
+(defun company-quickhelp--string-height (string)
+  (with-temp-buffer
+    (insert string)
+    (how-many "\n")))
 
 (defun company-quickhelp--set-timer ()
   (when (or (null company-quickhelp--timer)
