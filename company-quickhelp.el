@@ -194,7 +194,7 @@ currently active `company' completion candidate."
              (fg-bg `(,company-quickhelp-color-foreground
                       . ,company-quickhelp-color-background))
              (pos (save-excursion
-                    (goto-char (overlay-start ovl))
+                    (goto-char (min (overlay-start ovl) (point)))
                     (line-beginning-position)))
              (dy (if (and ovl (< (overlay-get ovl 'company-height) 0))
                      0
