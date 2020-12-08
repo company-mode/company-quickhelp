@@ -172,7 +172,8 @@ currently active `company' completion candidate."
     (pos-tip-hide)))
 
 (defun company-quickhelp--show ()
-  (when (company-quickhelp-pos-tip-available-p)
+  (when (and (company-quickhelp-pos-tip-available-p)
+             company-selection)
     (company-quickhelp--cancel-timer)
     (while-no-input
       (let* ((selected (nth company-selection company-candidates))
