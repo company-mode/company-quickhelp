@@ -146,15 +146,16 @@ just grab the first candidate and press forward."
               (company-quickhelp--docstring-from-buffer (or doc-begin (point-min))))))))))
 
 (defun company-quickhelp--doc (selected)
-  (cl-letf (((symbol-function 'completing-read)
-             #'company-quickhelp--completing-read))
-    (let* ((doc-and-meta (company-quickhelp--fetch-docstring selected))
-           (truncated (plist-get doc-and-meta :truncated))
-           (doc (plist-get doc-and-meta :doc)))
-      (unless (member doc '(nil ""))
-        (if truncated
-            (concat doc "\n\n[...]")
-          doc)))))
+  (let ((message-log-max nil) (inhibit-message t))
+    (cl-letf (((symbol-function 'completing-read)
+               #'company-quickhelp--completing-read))
+      (let* ((doc-and-meta (company-quickhelp--fetch-docstring selected))
+             (truncated (plist-get doc-and-meta :truncated))
+             (doc (plist-get doc-and-meta :doc)))
+        (unless (member doc '(nil ""))
+          (if truncated
+              (concat doc "\n\n[...]")
+            doc))))))
 
 (defun company-quickhelp-manual-begin ()
   "Manually trigger the `company-quickhelp' popup for the
@@ -219,7 +220,7 @@ currently active `company' completion candidate."
 
 (defun company-quickhelp--set-timer ()
   (when (or (null company-quickhelp--timer)
-        (eq this-command #'company-quickhelp-manual-begin))
+            (eq this-command #'company-quickhelp-manual-begin))
     (setq company-quickhelp--timer
           (run-with-idle-timer company-quickhelp-delay nil
                                'company-quickhelp--show))))
