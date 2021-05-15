@@ -205,7 +205,7 @@ currently active `company' completion candidate."
                          (w-h (pos-tip-string-width-height doc)))
                     (cond
                      ((> (car w-h) width)
-                      (setq doc (pos-tip-fill-string doc width nil 'none nil max-height)
+                      (setq doc (pos-tip-fill-string doc width nil nil nil max-height)
                             w-h (pos-tip-string-width-height doc)))
                      ((or (> (car w-h) max-width)
                           (> (cdr w-h) max-height))
