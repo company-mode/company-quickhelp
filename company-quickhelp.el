@@ -128,14 +128,14 @@ resolve ambiguous documentation requests.  Instead of failing we
 just grab the first candidate and press forward."
   (car candidates))
 
-(defun company-quickhelp--fetch-docstring (backend)
-  "Fetch docstring from BACKEND."
-  (let ((quickhelp-str (company-call-backend 'quickhelp-string backend)))
+(defun company-quickhelp--fetch-docstring (selected)
+  "Fetch docstring from the current backend for SELECTED string."
+  (let ((quickhelp-str (company-call-backend 'quickhelp-string selected)))
     (if (stringp quickhelp-str)
         (with-temp-buffer
           (insert quickhelp-str)
           (company-quickhelp--docstring-from-buffer (point-min)))
-      (let ((doc (company-call-backend 'doc-buffer backend)))
+      (let ((doc (company-call-backend 'doc-buffer selected)))
         (when doc
           ;; The company backend can either return a buffer with the doc or a
           ;; cons containing the doc buffer and a position at which to start
