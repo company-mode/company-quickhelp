@@ -44,7 +44,7 @@
   "Documentation popups for `company-mode'"
   :group 'company)
 
-(defcustom company-quickhelp-use-propertized-text nil
+(defcustom company-quickhelp-use-propertized-text t
   "Allow the text to have properties like color, font size, etc."
   :type '(choice (boolean :tag "Allow"))
   :group 'company-quickhelp)
