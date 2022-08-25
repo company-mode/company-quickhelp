@@ -98,7 +98,7 @@ be triggered manually using `company-quickhelp-show'."
 (defun company-quickhelp--skip-footers-backwards ()
   "Skip backwards over footers and blank lines."
   (beginning-of-line)
-  (while (and (not (= (point-at-eol) (point-min)))
+  (while (and (not (= (line-end-position) (point-min)))
               (or
                ;; [back] appears at the end of the help elisp help buffer
                (looking-at-p "\\[back\\]")
@@ -117,9 +117,9 @@ be triggered manually using `company-quickhelp-show'."
   "Fetch docstring from START."
   (goto-char start)
   (company-quickhelp--goto-max-line)
-  (let ((truncated (< (point-at-eol) (point-max))))
+  (let ((truncated (< (line-end-position) (point-max))))
     (company-quickhelp--skip-footers-backwards)
-    (list :doc (buffer-substring start (point-at-eol))
+    (list :doc (buffer-substring start (line-end-position))
           :truncated truncated)))
 
 (defun company-quickhelp--completing-read (prompt candidates &rest rest)
