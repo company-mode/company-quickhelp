@@ -53,7 +53,7 @@
   "Delay, in seconds, before the quickhelp popup appears.
 
 If set to nil the popup won't automatically appear, but can still
-be triggered manually using `company-quickhelp-show'."
+be triggered manually using `company-quickhelp-manual-begin'."
   :type '(choice (number :tag "Delay in seconds")
                  (const :tag "Don't popup help automatically" nil))
   :group 'company-quickhelp)
@@ -232,7 +232,6 @@ currently active `company' completion candidate."
 
 (defun company-quickhelp-hide ()
   (company-cancel))
-
 
 (defun company-quickhelp-pos-tip-available-p ()
   "Return t if and only if pos-tip is expected work in the current frame."
